@@ -14,4 +14,10 @@ namespace javarand
     public:
 
   };
+
+  long JavaRandom::initialScramble(long seed)
+  {
+    return (seed ^ multiplier) & mask;
+  }
 };
+
