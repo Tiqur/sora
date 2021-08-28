@@ -1,22 +1,26 @@
 #include <iostream>
-#include <vector>
+#include <algorithm>
+#include <set>
 #include "random.h"
 using namespace javarand;
 
 
 struct coords
 {
-  public:
-    int x;
-    int z;
+  int x;
+  int z;
 };
+
+bool operator<(const coords& c1, const coords& c2)
+{
+  return c1.x < c2.x;
+}
 
 struct cluster
 {
-  public:
-    coords location;
-    int width;
-    int height;
+  coords location;
+  int width;
+  int height;
 };
 
 namespace world
@@ -65,27 +69,28 @@ namespace world
   // Recursively search for nearby slime chunks within cluster and return dimensions
   cluster World::getCluster(int x, int z, int depth)
   {
-    // If not slime chunk, return false;
-    if (!this->isSlimeChunk(x, z)) return cluster{};
-
     // Holds coordinates of checked chunks ( initialized to 250 since it's virtually impossible for a cluster to be that size  )
-    static std::vector<coords> checked_chunks;
+    static std::set<coords> checked_chunks;
+
+    // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
+    bool contains_chunk = std::find_if(checked_chunks.begin(), checked_chunks.end(), [x, z](coords const & item){ return item.x == x && item.z == z; }) != checked_chunks.end();
+    if (!this->isSlimeChunk(x, z) || contains_chunk) return cluster{};
 
     // If initial cluster check, clear checked_chunks
     if (depth)
       checked_chunks.clear();
 
     // Push self to checked chunks
-    checked_chunks.push_back(coords{x, z});
+    checked_chunks.insert({x, z});
 
-    std::cout << checked_chunks.size() << std::endl;
 
     // Check sides
-    //getCluster(x+1, z);
-    //getCluster(x-1, z);
-    //getCluster(x, z+1);
-    //getCluster(x, z-1);
+    getCluster(x+1, z);
+    getCluster(x-1, z);
+    getCluster(x, z+1);
+    getCluster(x, z-1);
 
+    std::cout << checked_chunks.size() << std::endl;
     // Check corners
     //getCluster(x-1, z+1);
     //getCluster(x+1, z-1);
