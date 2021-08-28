@@ -4,7 +4,7 @@ using namespace world;
 
 int main()
 {
-  World world = World(0);
-  std::cout << world.isSlimeChunk(38, 11) << std::endl;
+  World world = World(0, 50);
+  world.printMap(50);
   return 0;
 }

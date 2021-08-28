@@ -9,16 +9,20 @@ namespace world
     private:
       int seed;
       JavaRandom rand;
+      bool isSlimeChunk(int x, int z);
+      void search(int radius);
 
     public:
-      bool isSlimeChunk(int x, int z);
-      World(long seed) {
+      void printMap(int radius);
+      World(long seed, int radius) {
         this->seed = seed;
+        this->search(radius);
       }
   };
 
-  bool World::isSlimeChunk(int x, int z) {
-    std::cout << x << " " << z << std::endl;
+  // Determine if there is a slime chunk at x, z
+  bool World::isSlimeChunk(int x, int z) 
+  {
     // Set seed and location
     rand.setSeed(
       this->seed +
@@ -29,6 +33,31 @@ namespace world
 
     // Determine if slime chunk
     return !(rand.nextInt(10));
+  }
+
+  // Search radius around 0, 0 for slime chunks
+  void World::search(int radius)
+  {
+    int half_radius = radius / 2;
+    for (int x = -half_radius; x < half_radius; x++)
+    {
+      for (int z = -half_radius; z < half_radius; z++)
+      {
+        // If slime chunk, find cluster size
+        if (isSlimeChunk(x, z)) {
+
+        }
+      }
+    }
+  }
+
+  void World::printMap(int radius)
+  {
+    int half_radius = radius / 2;
+    for (int x = -half_radius; x < half_radius; x++)
+      for (int z = -half_radius; z < half_radius; z++)
+        std::cout << (isSlimeChunk(x, z) ? "■ " : "□ ");
+      std::cout << std::endl;
   }
 
 };
