@@ -1,12 +1,10 @@
-#include "random.h"
 #include <iostream>
-
-using namespace javarand;
+#include "world.h"
+using namespace world;
 
 int main()
 {
-  JavaRandom rand;
-  rand.setSeed(0);
-  std::cout << rand.nextInt() << std::endl;
+  World world;
+  world.test();
   return 0;
 }
