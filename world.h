@@ -6,14 +6,16 @@ namespace world
 {
   class World
   {
+    private:
+      int seed;
+      JavaRandom rand;
+
     public:
-      void test();
+      bool isSlimeChunk(int x, int z);
+      World(long seed) {
+        this->seed = seed;
+      }
   };
 
-  void World::test() {
-    JavaRandom rand;
-    rand.setSeed(0);
-    std::cout << rand.nextInt() << std::endl;
-  };
 };
 
