@@ -55,9 +55,11 @@ namespace world
   {
     int half_radius = radius / 2;
     for (int x = -half_radius; x < half_radius; x++)
+    {
       for (int z = -half_radius; z < half_radius; z++)
         std::cout << (isSlimeChunk(x, z) ? "■ " : "□ ");
       std::cout << std::endl;
+    }
   }
 
 };
