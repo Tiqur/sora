@@ -12,12 +12,18 @@ namespace javarand
       int next(int bits);
 
     public:
+      long seed;
 
   };
 
+  void JavaRandom::setSeed(long seed)
+  {
+    this->seed = this->initialScramble(seed);
+  }
+
   long JavaRandom::initialScramble(long seed)
   {
-    return (seed ^ multiplier) & mask;
+    return (this->seed ^ this->multiplier) & this->mask;
   }
 };
 
