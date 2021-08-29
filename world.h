@@ -37,6 +37,7 @@ namespace world
 
     public:
       void printMap(int radius);
+      void printCluster(std::vector<coords> chunks);
       World(long seed, int radius, int spacing) {
         this->spacing = spacing;
         this->seed = seed;
@@ -95,14 +96,20 @@ namespace world
     if (depth)
       std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
 
+    this->printCluster(checked_chunks);
+  }
+
+  // Display chunk cluster
+  void World::printCluster(std::vector<coords> chunks)
+  {
     // Initialize bounding box
-    int top = checked_chunks.front().x;
+    int top = chunks.front().x;
     int bottom = top;
-    int left = checked_chunks.front().z;
+    int left = chunks.front().z;
     int right = left;
 
     // Find bounding box
-    for (coords &c : checked_chunks) {
+    for (coords &c : chunks) {
       if (c.z < left) left = c.z;
       if (c.z > right) right = c.z;
       if (c.x > top) top = c.x;
@@ -122,9 +129,8 @@ namespace world
       for (int x = 0; x < height; x++)
       {
         coords c{x+bottom, z+left};
-        bool checked_contains = std::any_of(checked_chunks.begin(), checked_chunks.end(), [c](coords c1){ return(c1.x == c.x && c1.z == c.z);});
-        //std::cout << x+top << ", " << z+left << " : " << checked_contains << std::endl;
-        cluster[z][x] = checked_contains;
+        bool chunks_contains = std::any_of(chunks.begin(), chunks.end(), [c](coords c1){ return(c1.x == c.x && c1.z == c.z);});
+        cluster[z][x] = chunks_contains;
       }
     }
 
@@ -137,7 +143,6 @@ namespace world
       }
       std::cout << std::endl;
     }
-
   }
 
 
