@@ -94,6 +94,26 @@ namespace world
 
     if (depth)
       std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
+
+    // Initialize bounding box
+    int top = checked_chunks.front().x;
+    int bottom = top;
+    int left = checked_chunks.front().z;
+    int right = left;
+
+    // Find bounding box
+    for (coords &c : checked_chunks) {
+      if (c.z < left) left = c.z;
+      if (c.z > right) right = c.z;
+      if (c.x > top) top = c.x;
+      if (c.x < bottom) top = c.x;
+    }
+
+    int width = right + 1 - left;
+    int height = top + 1 - bottom;
+
+    std::cout << "Height: " << height << std::endl;
+    std::cout << "Width: " << width << std::endl;
   }
 
   // Print map to console
