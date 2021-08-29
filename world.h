@@ -159,9 +159,9 @@ namespace world
     std::vector<std::vector<bool>> cluster = this->generateClusterRegion(chunks);
 
     // Display cluster
-    for (int i = 0; i < cluster[0].size(); i++) 
+    for (int i = 0; i < cluster.size(); i++) 
     {
-      for (int j = 0; j < cluster.size(); j++) 
+      for (int j = 0; j < cluster[0].size(); j++) 
       {
         std::cout << (cluster[i][j] ? "■ " : "□ ");
       }
