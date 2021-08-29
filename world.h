@@ -27,6 +27,7 @@ namespace world
   {
     private:
       long seed;
+      bool logging = false;
       int spacing;
       int min_size;
       JavaRandom rand;
@@ -38,8 +39,9 @@ namespace world
     public:
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
-      World(long seed, int radius, int min_size, int spacing) {
+      World(long seed, int radius, int min_size, int spacing, bool logging) {
         this->min_size = min_size;
+        this->logging = logging;
         this->spacing = spacing;
         this->seed = seed;
         this->search(radius);
@@ -102,7 +104,7 @@ namespace world
         auto it_res = this->slime_clusters.insert(checked_chunks);
 
         // Only call if not duplicate
-        if (it_res.second) {
+        if (it_res.second && this->logging) {
           std::cout << "----------------------------------------------------------" << std::endl;
           std::cout << "Seed: " << this->seed << std::endl;
           std::cout << "Size: " << checked_chunks.size() << std::endl;
