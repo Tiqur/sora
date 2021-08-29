@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <optional>
 #include <set>
 #include "random.h"
 using namespace javarand;
@@ -16,13 +17,6 @@ bool operator<(const coords& c1, const coords& c2)
   return c1.x < c2.x;
 }
 
-struct cluster
-{
-  coords location;
-  int width;
-  int height;
-};
-
 namespace world
 {
   class World
@@ -30,19 +24,20 @@ namespace world
     private:
       long seed;
       int spacing;
+      int min_size;
       JavaRandom rand;
       bool isSlimeChunk(int x, int z);
-      cluster getCluster(int x, int z, int depth = 0);
+      std::optional<std::vector<coords>> getCluster(int x, int z, int depth = 0);
       void search(int radius);
 
     public:
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
-      World(long seed, int radius, int spacing) {
+      World(long seed, int radius, int min_size, int spacing) {
+        this->min_size = min_size;
         this->spacing = spacing;
         this->seed = seed;
-        //this->search(radius);
-        this->getCluster(7, -255, 1);
+        this->search(radius);
       }
   };
 
@@ -70,7 +65,7 @@ namespace world
         getCluster(x, z, 1);
   }
   // Recursively search for nearby slime chunks within cluster and return dimensions
-  cluster World::getCluster(int x, int z, int depth)
+  std::optional<std::vector<coords>> World::getCluster(int x, int z, int depth)
   {
     // Holds coordinates of already checked chunks 
     static std::vector<coords> checked_chunks;
@@ -78,7 +73,7 @@ namespace world
     
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
     bool contains_chunk = std::any_of(checked_chunks.begin(), checked_chunks.end(), [current_coords](coords c1){ return(c1.x == current_coords.x && c1.z == current_coords.z);});
-    if (!this->isSlimeChunk(x, z) || contains_chunk) return cluster{};
+    if (!this->isSlimeChunk(x, z) || contains_chunk) return {};
 
     // If initial cluster check, clear checked_chunks
     if (depth)
@@ -93,10 +88,13 @@ namespace world
     getCluster(x, z+1);
     getCluster(x, z-1);
 
-    if (depth)
-      std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
-
-    this->printCluster(checked_chunks);
+    // Return cluster if size >= min_size
+    if (checked_chunks.size() >= this->min_size) {
+        if (depth)
+          std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
+        return checked_chunks;
+    }
+    else return {};
   }
 
   // Display chunk cluster
