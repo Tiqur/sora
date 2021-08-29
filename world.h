@@ -29,6 +29,7 @@ namespace world
   {
     private:
       long seed;
+      int spacing;
       JavaRandom rand;
       bool isSlimeChunk(int x, int z);
       cluster getCluster(int x, int z, int depth = 0);
@@ -36,10 +37,10 @@ namespace world
 
     public:
       void printMap(int radius);
-      World(long seed, int radius) {
+      World(long seed, int radius, int spacing) {
+        this->spacing = spacing;
         this->seed = seed;
-        //this->search(radius);
-        this->getCluster(7, -255, 1);
+        this->search(radius);
       }
   };
 
@@ -99,9 +100,9 @@ namespace world
   void World::printMap(int radius)
   {
     int half_radius = radius / 2;
-    for (int x = -half_radius; x < half_radius; x++)
+    for (int x = -half_radius; x < half_radius; x+=this->spacing)
     {
-      for (int z = -half_radius; z <= half_radius; z++)
+      for (int z = -half_radius; z <= half_radius; z+=this->spacing)
       {
          if (z == -half_radius) {
           // Print x coordinates
