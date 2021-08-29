@@ -32,6 +32,7 @@ namespace world
       int min_size;
       JavaRandom rand;
       bool isSlimeChunk(int x, int z);
+      std::vector<std::vector<bool>> generateClusterRegion(std::vector<coords>);
       void getCluster(int x, int z, int depth = 0);
       std::set<std::vector<coords>> slime_clusters;
       void search(int radius);
@@ -116,8 +117,8 @@ namespace world
     }
   }
 
-  // Display chunk cluster
-  void World::printCluster(std::vector<coords> chunks)
+  // Generate 2D array representation of cluster
+  std::vector<std::vector<bool>> World::generateClusterRegion(std::vector<coords> chunks)
   {
     // Initialize bounding box
     int top = chunks.front().x;
@@ -138,8 +139,7 @@ namespace world
     int height = top + 1 - bottom;
 
     // Create 2D array representation of chunk cluster
-    bool cluster[width][height] = {0};
-
+    std::vector<std::vector<bool>> cluster = {width, std::vector<bool>(height, 0)};
     // Set cluster 
     for (int z = 0; z < width; z++)
     {
@@ -150,11 +150,18 @@ namespace world
         cluster[z][x] = chunks_contains;
       }
     }
+    return cluster;
+  }
+
+  // Display chunk cluster
+  void World::printCluster(std::vector<coords> chunks)
+  {
+    std::vector<std::vector<bool>> cluster = this->generateClusterRegion(chunks);
 
     // Display cluster
-    for (int i = 0; i < width; i++) 
+    for (int i = 0; i < cluster[0].size(); i++) 
     {
-      for (int j = 0; j < height; j++) 
+      for (int j = 0; j < cluster.size(); j++) 
       {
         std::cout << (cluster[i][j] ? "■ " : "□ ");
       }
