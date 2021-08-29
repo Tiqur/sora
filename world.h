@@ -109,12 +109,37 @@ namespace world
       if (c.x < bottom) top = c.x;
     }
 
+    // Bounding box dimensions
     int width = right + 1 - left;
     int height = top + 1 - bottom;
 
-    std::cout << "Height: " << height << std::endl;
-    std::cout << "Width: " << width << std::endl;
+    // Create 2D array representation of chunk cluster
+    bool cluster[width][height] = {0};
+
+    // Set cluster 
+    for (int z = 0; z < width; z++)
+    {
+      for (int x = 0; x < height; x++)
+      {
+        coords c{x+bottom, z+left};
+        bool checked_contains = std::any_of(checked_chunks.begin(), checked_chunks.end(), [c](coords c1){ return(c1.x == c.x && c1.z == c.z);});
+        //std::cout << x+top << ", " << z+left << " : " << checked_contains << std::endl;
+        cluster[z][x] = checked_contains;
+      }
+    }
+
+    // Display cluster
+    for (int i = 0; i < width; i++) 
+    {
+      for (int j = 0; j < height; j++) 
+      {
+        std::cout << (cluster[i][j] ? "■ " : "□ ");
+      }
+      std::cout << std::endl;
+    }
+
   }
+
 
   // Print map to console
   void World::printMap(int radius)
