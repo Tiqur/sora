@@ -102,8 +102,14 @@ namespace world
         auto it_res = this->slime_clusters.insert(checked_chunks);
 
         // Only call if not duplicate
-        if (it_res.second)
-          std::cout << "size: " <<  checked_chunks.size() << " Chunks: " << x << " " << z << " Coords: " << x*16 << " " << z*16 << std::endl;
+        if (it_res.second) {
+          std::cout << "----------------------------------------------------------" << std::endl;
+          std::cout << "Seed: " << this->seed << std::endl;
+          std::cout << "Size: " << checked_chunks.size() << std::endl;
+          std::cout << "Chunks: (" << x << ", " << z << ")" << std::endl;
+          std::cout << "Coordinates: (" << x*16 << ", " << z*16 << ")" << std::endl << std::endl;
+          this->printCluster(checked_chunks);
+        }
       }
     }
   }
