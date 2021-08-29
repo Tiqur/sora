@@ -60,8 +60,8 @@ namespace world
   void World::search(int radius)
   {
     int half_radius = radius / 2;
-    for (int z = -half_radius; z < half_radius; z++)
-      for (int x = -half_radius; x < half_radius; x++)
+    for (int z = -half_radius; z < half_radius; z+=this->spacing)
+      for (int x = -half_radius; x < half_radius; x+=this->spacing)
         getCluster(x, z, 1);
   }
   // Recursively search for nearby slime chunks within cluster and return dimensions
