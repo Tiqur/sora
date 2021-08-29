@@ -40,7 +40,8 @@ namespace world
       World(long seed, int radius, int spacing) {
         this->spacing = spacing;
         this->seed = seed;
-        this->search(radius);
+        //this->search(radius);
+        this->getCluster(7, -255, 1);
       }
   };
 
@@ -63,11 +64,10 @@ namespace world
   void World::search(int radius)
   {
     int half_radius = radius / 2;
-    for (int x = -half_radius; x < half_radius; x++)
-      for (int z = -half_radius; z < half_radius; z++)
+    for (int z = -half_radius; z < half_radius; z++)
+      for (int x = -half_radius; x < half_radius; x++)
         getCluster(x, z, 1);
   }
-
   // Recursively search for nearby slime chunks within cluster and return dimensions
   cluster World::getCluster(int x, int z, int depth)
   {
@@ -100,9 +100,9 @@ namespace world
   void World::printMap(int radius)
   {
     int half_radius = radius / 2;
-    for (int x = -half_radius; x < half_radius; x+=this->spacing)
+    for (int z = -half_radius; z < half_radius; z+=this->spacing)
     {
-      for (int z = -half_radius; z <= half_radius; z+=this->spacing)
+      for (int x = -half_radius; x <= half_radius; x+=this->spacing)
       {
          if (z == -half_radius) {
           // Print x coordinates
