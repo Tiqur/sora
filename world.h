@@ -30,8 +30,8 @@ namespace world
     private:
       int seed;
       JavaRandom rand;
-      cluster getCluster(int x, int z, int depth = 0);
       bool isSlimeChunk(int x, int z);
+      cluster getCluster(int x, int z, int depth = 0);
       void search(int radius);
 
     public:
@@ -71,9 +71,10 @@ namespace world
   {
     // Holds coordinates of checked chunks ( initialized to 250 since it's virtually impossible for a cluster to be that size  )
     static std::set<coords> checked_chunks;
-
+    coords current_coords = coords{x, z};
+    
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
-    bool contains_chunk = std::find_if(checked_chunks.begin(), checked_chunks.end(), [x, z](coords const & item){ return item.x == x && item.z == z; }) != checked_chunks.end();
+    bool contains_chunk = std::any_of(checked_chunks.begin(), checked_chunks.end(), [current_coords](coords c1){ return(c1.x == current_coords.x && c1.z == current_coords.z);});
     if (!this->isSlimeChunk(x, z) || contains_chunk) return cluster{};
 
     // If initial cluster check, clear checked_chunks
@@ -83,14 +84,15 @@ namespace world
     // Push self to checked chunks
     checked_chunks.insert({x, z});
 
-
     // Check sides
     getCluster(x+1, z);
     getCluster(x-1, z);
     getCluster(x, z+1);
     getCluster(x, z-1);
 
-    std::cout << checked_chunks.size() << std::endl;
+    if (depth)
+      std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
+
     // Check corners
     //getCluster(x-1, z+1);
     //getCluster(x+1, z-1);
@@ -105,10 +107,22 @@ namespace world
     int half_radius = radius / 2;
     for (int x = -half_radius; x < half_radius; x++)
     {
-      for (int z = -half_radius; z < half_radius; z++)
-        std::cout << (isSlimeChunk(x, z) ? "■ " : "□ ");
+      for (int z = -half_radius; z <= half_radius; z++)
+      {
+         if (z == -half_radius) {
+          // Print x coordinates
+          std::cout << (x >= 0 ? " " : "") << x << " ";
+        } else {
+          // Display chunk type
+          std::cout << (isSlimeChunk(x, z) ? "■ " : "□ ");
+        }
+      }
       std::cout << std::endl;
     }
+
+    for (int z = -half_radius; z < half_radius; z++)
+      std::cout << z << " ";
+
   }
 
 };

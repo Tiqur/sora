@@ -4,7 +4,7 @@ using namespace world;
 
 int main()
 {
-  World world = World(0, 20);
-  world.printMap(20);
+  World world = World(1, 12);
+  world.printMap(12);
   return 0;
 }
