@@ -1,6 +1,5 @@
 #include <iostream>
 #include <algorithm>
-#include <optional>
 #include <set>
 #include "random.h"
 using namespace javarand;
@@ -17,6 +16,11 @@ bool operator<(const coords& c1, const coords& c2)
   return c1.x < c2.x;
 }
 
+bool operator==(const coords& c1, const coords& c2)
+{
+  return c1.x == c2.x;
+}
+
 namespace world
 {
   class World
@@ -27,7 +31,8 @@ namespace world
       int min_size;
       JavaRandom rand;
       bool isSlimeChunk(int x, int z);
-      std::optional<std::vector<coords>> getCluster(int x, int z, int depth = 0);
+      void getCluster(int x, int z, int depth = 0);
+      std::set<std::vector<coords>> slime_clusters;
       void search(int radius);
 
     public:
@@ -65,7 +70,7 @@ namespace world
         getCluster(x, z, 1);
   }
   // Recursively search for nearby slime chunks within cluster and return dimensions
-  std::optional<std::vector<coords>> World::getCluster(int x, int z, int depth)
+  void World::getCluster(int x, int z, int depth)
   {
     // Holds coordinates of already checked chunks 
     static std::vector<coords> checked_chunks;
@@ -73,28 +78,34 @@ namespace world
     
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
     bool contains_chunk = std::any_of(checked_chunks.begin(), checked_chunks.end(), [current_coords](coords c1){ return(c1.x == current_coords.x && c1.z == current_coords.z);});
-    if (!this->isSlimeChunk(x, z) || contains_chunk) return {};
+    if (this->isSlimeChunk(x, z) && !contains_chunk) {
 
-    // If initial cluster check, clear checked_chunks
-    if (depth)
-      checked_chunks.clear();
+      // If initial cluster check, clear checked_chunks
+      if (depth)
+        checked_chunks.clear();
 
-    // Push self to checked chunks
-    checked_chunks.push_back(current_coords);
+      // Push self to checked chunks
+      checked_chunks.push_back(current_coords);
 
-    // Check sides
-    getCluster(x+1, z);
-    getCluster(x-1, z);
-    getCluster(x, z+1);
-    getCluster(x, z-1);
+      // Check sides
+      getCluster(x+1, z);
+      getCluster(x-1, z);
+      getCluster(x, z+1);
+      getCluster(x, z-1);
 
-    // Return cluster if size >= min_size
-    if (checked_chunks.size() >= this->min_size) {
-        if (depth)
-          std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
-        return checked_chunks;
+
+      // Add cluster to set if size >= min_size
+      if (checked_chunks.size() >= this->min_size && depth) {
+
+        // Sort cluster array to prevent duplicates
+        std::stable_sort(checked_chunks.begin(), checked_chunks.end());
+        auto it_res = this->slime_clusters.insert(checked_chunks);
+
+        // Only call if not duplicate
+        if (it_res.second)
+          std::cout << "size: " <<  checked_chunks.size() << " Chunks: " << x << " " << z << " Coords: " << x*16 << " " << z*16 << std::endl;
+      }
     }
-    else return {};
   }
 
   // Display chunk cluster

@@ -4,10 +4,10 @@ using namespace world;
 
 int main()
 {
-  int chunk_radius = 5000;
-  int spacing = 2; // Default 1
-  int min_size = 10;
-  World world = World(-159660684484593011, chunk_radius, min_size, spacing);
+  int chunk_radius = 10000;
+  int spacing = 3; // Default 1
+  int min_size = 14;
+  World world = World(11, chunk_radius, min_size, spacing);
   //world.printMap(20);
   return 0;
 }
