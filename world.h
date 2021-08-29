@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <stack>
 #include <set>
 #include "random.h"
 using namespace javarand;
@@ -81,7 +82,7 @@ namespace world
   coords World::createSubMatrixHistogram(std::vector<std::vector<bool>> chunks)
   {
     // Initialize array and set all values to 0
-    int histogram[chunks.size()] = {0};
+    int histogram[chunks[0].size()] = {0};
     coords maxDimensions{0, 0};
 
     // increment each element if multiple y chunks ( like histogram values )
@@ -99,13 +100,55 @@ namespace world
       coords temp = this->findLargestRect(histogram);
       if (temp.x * temp.z > maxDimensions.x * maxDimensions.z) maxDimensions = temp;
     }
+
     return maxDimensions;
   }
 
   // Find largest rect in submatrix histogram and return dimensions
   coords World::findLargestRect(int histogram[])
   {
+    int h;
+    int i;
+    int tempH;
+    int tempPos = 0;
+    int tempSize;
+    coords dimensions;
+    double maxSize = -std::numeric_limits<double>::infinity();
+    std::stack<int> pStack;
+    std::stack<int> hStack;
 
+    for (i = 0; i < sizeof(histogram) / sizeof(*histogram); i++)
+    {
+      h = histogram[i];
+
+      if (!hStack.size() || h > hStack.top()) {
+        hStack.push(h);
+        pStack.push(i);
+      } else if (h < hStack.top()) {
+        while (!hStack.empty() && h < hStack.top()) {
+          tempH = hStack.top();
+          tempPos = pStack.top();
+          hStack.pop();
+          pStack.pop();
+          tempSize = tempH * (i - tempPos);
+          maxSize = std::max((double)tempSize, maxSize);
+          if (maxSize == tempSize) dimensions = coords{i - tempPos, tempH};
+        }
+        hStack.emplace(h);
+        pStack.emplace(tempPos);
+      }
+    }
+
+    while (!hStack.empty()) {
+      tempH = hStack.top();
+      tempPos = pStack.top();
+      hStack.pop();
+      pStack.pop();
+      tempSize = tempH * (i - tempPos);
+      maxSize = std::max((double)tempSize, maxSize);
+      if (maxSize == tempSize) dimensions = coords{i - tempPos, tempH};
+    }
+    return dimensions;
   }
 
   // Recursively search for nearby slime chunks within cluster and return dimensions
@@ -148,6 +191,11 @@ namespace world
           std::cout << "Chunks: (" << x << ", " << z << ")" << std::endl;
           std::cout << "Coordinates: (" << x*16 << ", " << z*16 << ")" << std::endl << std::endl;
           this->printCluster(checked_chunks);
+
+          // Find largest rect dimensions within cluster region
+          std::vector<std::vector<bool>> cluster_region = this->generateClusterRegion(checked_chunks);
+          coords largest_rect_dimensions = this->createSubMatrixHistogram(cluster_region);
+          std::cout << largest_rect_dimensions.x << " " << largest_rect_dimensions.z << std::endl;
         }
       }
     }
@@ -164,10 +212,10 @@ namespace world
 
     // Find bounding box
     for (coords &c : chunks) {
-      if (c.z < left) left = c.z;
-      if (c.z > right) right = c.z;
-      if (c.x > top) top = c.x;
-      if (c.x < bottom) top = c.x;
+      left = std::min(c.z, left);
+      right = std::max(c.z, right);
+      top = std::max(c.x, top);
+      bottom = std::min(c.x, bottom);
     }
 
     // Bounding box dimensions
@@ -227,8 +275,6 @@ namespace world
 
     for (int z = -half_radius; z < half_radius; z++)
       std::cout << z << " ";
-
   }
-
 };
 
