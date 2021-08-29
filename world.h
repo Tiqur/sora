@@ -28,7 +28,7 @@ namespace world
   class World
   {
     private:
-      int seed;
+      long seed;
       JavaRandom rand;
       bool isSlimeChunk(int x, int z);
       cluster getCluster(int x, int z, int depth = 0);
@@ -38,7 +38,8 @@ namespace world
       void printMap(int radius);
       World(long seed, int radius) {
         this->seed = seed;
-        this->search(radius);
+        //this->search(radius);
+        this->getCluster(7, -255, 1);
       }
   };
 
@@ -69,8 +70,8 @@ namespace world
   // Recursively search for nearby slime chunks within cluster and return dimensions
   cluster World::getCluster(int x, int z, int depth)
   {
-    // Holds coordinates of checked chunks ( initialized to 250 since it's virtually impossible for a cluster to be that size  )
-    static std::set<coords> checked_chunks;
+    // Holds coordinates of already checked chunks 
+    static std::vector<coords> checked_chunks;
     coords current_coords = coords{x, z};
     
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
@@ -82,7 +83,7 @@ namespace world
       checked_chunks.clear();
 
     // Push self to checked chunks
-    checked_chunks.insert({x, z});
+    checked_chunks.push_back(current_coords);
 
     // Check sides
     getCluster(x+1, z);
@@ -92,13 +93,6 @@ namespace world
 
     if (depth)
       std::cout << "size: " <<  checked_chunks.size() << " coords: " << x << " " << z << std::endl;
-
-    // Check corners
-    //getCluster(x-1, z+1);
-    //getCluster(x+1, z-1);
-    //getCluster(x+1, z+1);
-    //getCluster(x-1, z-1);
-
   }
 
   // Print map to console
