@@ -31,15 +31,19 @@ namespace world
       int spacing;
       int min_size;
       JavaRandom rand;
+
+      void search(int radius);
+      coords findLargestRect(int[]);
       bool isSlimeChunk(int x, int z);
-      std::vector<std::vector<bool>> generateClusterRegion(std::vector<coords>);
       void getCluster(int x, int z, int depth = 0);
       std::set<std::vector<coords>> slime_clusters;
-      void search(int radius);
+      coords createSubMatrixHistogram(std::vector<std::vector<bool>> chunks);
+      std::vector<std::vector<bool>> generateClusterRegion(std::vector<coords>);
 
     public:
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
+
       World(long seed, int radius, int min_size, int spacing, bool logging) {
         this->min_size = min_size;
         this->logging = logging;
@@ -72,6 +76,38 @@ namespace world
       for (int x = -half_radius; x < half_radius; x+=this->spacing)
         getCluster(x, z, 1);
   }
+
+  // https://www.youtube.com/watch?v=g8bSdXCG-lA
+  coords World::createSubMatrixHistogram(std::vector<std::vector<bool>> chunks)
+  {
+    // Initialize array and set all values to 0
+    int histogram[chunks.size()] = {0};
+    coords maxDimensions{0, 0};
+
+    // increment each element if multiple y chunks ( like histogram values )
+    for (int x = 0; x < chunks.size(); x++)
+    {
+      for (int z = 0; z < chunks[0].size(); z++)
+      {
+        // If slime chunk
+        if (chunks[x][z])
+          histogram[z]++;
+        else
+          histogram[z]=0;
+      }
+      
+      coords temp = this->findLargestRect(histogram);
+      if (temp.x * temp.z > maxDimensions.x * maxDimensions.z) maxDimensions = temp;
+    }
+    return maxDimensions;
+  }
+
+  // Find largest rect in submatrix histogram and return dimensions
+  coords World::findLargestRect(int histogram[])
+  {
+
+  }
+
   // Recursively search for nearby slime chunks within cluster and return dimensions
   void World::getCluster(int x, int z, int depth)
   {
