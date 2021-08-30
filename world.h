@@ -34,7 +34,7 @@ namespace world
       JavaRandom rand;
 
       void search(int radius);
-      coords findLargestRect(int[]);
+      coords findLargestRect(std::vector<int>);
       bool isSlimeChunk(int x, int z);
       void getCluster(int x, int z, int depth = 0);
       std::set<std::vector<coords>> slime_clusters;
@@ -82,7 +82,7 @@ namespace world
   coords World::createSubMatrixHistogram(std::vector<std::vector<bool>> chunks)
   {
     // Initialize array and set all values to 0
-    int histogram[chunks[0].size()] = {0};
+    std::vector<int> histogram(chunks[0].size(), 0);
     coords maxDimensions{0, 0};
 
     // increment each element if multiple y chunks ( like histogram values )
@@ -97,6 +97,7 @@ namespace world
           histogram[z]=0;
       }
       
+      // Find largest rectangle in region cluster
       coords temp = this->findLargestRect(histogram);
       if (temp.x * temp.z > maxDimensions.x * maxDimensions.z) maxDimensions = temp;
     }
@@ -105,7 +106,7 @@ namespace world
   }
 
   // Find largest rect in submatrix histogram and return dimensions
-  coords World::findLargestRect(int histogram[])
+  coords World::findLargestRect(std::vector<int> histogram)
   {
     int h;
     int i;
@@ -117,7 +118,7 @@ namespace world
     std::stack<int> pStack;
     std::stack<int> hStack;
 
-    for (i = 0; i < sizeof(histogram) / sizeof(*histogram); i++)
+    for (i = 0; i < histogram.size(); i++)
     {
       h = histogram[i];
 
