@@ -195,10 +195,9 @@ namespace world
 
         // Only call if not duplicate
         if (it_res.second && this->logging && should_return_cluster) {
-          std::cout << "----------------------------------------------------------" << std::endl;
           std::cout << "Seed: " << this->seed << std::endl;
           std::cout << "Chunks: (" << x << ", " << z << ")" << std::endl;
-          std::cout << "Coordinates: (" << x*16 << ", " << z*16 << ")" << std::endl << std::endl;
+          std::cout << "Coordinates: (" << x*16 << ", " << z*16 << ")" << std::endl;
 
           if (this->returnOnlyRectangles) {
             std::cout << "Size: " << largest_rect_dimensions.x * largest_rect_dimensions.z << std::endl;
@@ -207,10 +206,15 @@ namespace world
           }
 
           this->printCluster(checked_chunks);
+          std::cout << "-----------------------------------------------" << std::endl;
 
           // Return cluster if area >= this->min_size
           if (largest_rect_dimensions.x * largest_rect_dimensions.z >= this->min_size) {
-            std::cout << largest_rect_dimensions.x << " " << largest_rect_dimensions.z << std::endl;
+            // Post to database or write to file
+
+
+
+
           }
         }
       }
@@ -239,7 +243,8 @@ namespace world
     int height = top + 1 - bottom;
 
     // Create 2D array representation of chunk cluster
-    std::vector<std::vector<bool>> cluster = {width, std::vector<bool>(height, 0)};
+    std::vector<std::vector<bool>> cluster(width, std::vector<bool>(height, 0));
+
     // Set cluster 
     for (int z = 0; z < width; z++)
     {

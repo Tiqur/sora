@@ -12,12 +12,14 @@ const int min_size = 9;
 
 int main()
 {
-  std::cout << "Starting..." << std::endl;
+  std::cout << "Starting Slime Chunk Finder..." << std::endl;
+  std::cout << "-----------------------------------------------" << std::endl;
   std::cout << "Logging: " << (logging ? "true" : "false") << std::endl;
   std::cout << "Return Only Rectangles: " << (returnOnlyRectangles ? "true" : "false") << std::endl; 
   std::cout << "Search Radius: " << chunk_radius << std::endl;
   std::cout << "Spacing Optimization: " << spacing << " ( +" << spacing-1 << "00% )" << std::endl;
   std::cout << "Minimum Cluster Size: " << min_size << std::endl;
+  std::cout << "-----------------------------------------------" << std::endl;
   
   // Generate random number
   std::random_device rd;
