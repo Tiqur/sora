@@ -29,8 +29,9 @@ namespace world
     private:
       long seed;
       bool logging = false;
-      int spacing;
-      int min_size;
+      bool returnOnlyRectangles = true;
+      int spacing = 1;
+      int min_size = 8;
       JavaRandom rand;
 
       void search(int radius);
@@ -45,8 +46,9 @@ namespace world
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
 
-      World(long seed, int radius, int min_size, int spacing, bool logging) {
+      World(long seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles) {
         this->min_size = min_size;
+        this->returnOnlyRectangles = returnOnlyRectangles;
         this->logging = logging;
         this->spacing = spacing;
         this->seed = seed;
@@ -184,19 +186,32 @@ namespace world
         std::stable_sort(checked_chunks.begin(), checked_chunks.end());
         auto it_res = this->slime_clusters.insert(checked_chunks);
 
+        // Find largest rect dimensions within cluster region
+        std::vector<std::vector<bool>> cluster_region = this->generateClusterRegion(checked_chunks);
+        coords largest_rect_dimensions = this->createSubMatrixHistogram(cluster_region);
+
+        // If should return cluster
+        bool should_return_cluster = (this->returnOnlyRectangles ? largest_rect_dimensions.x * largest_rect_dimensions.z > this->min_size : checked_chunks.size() > this->min_size);
+
         // Only call if not duplicate
-        if (it_res.second && this->logging) {
+        if (it_res.second && this->logging && should_return_cluster) {
           std::cout << "----------------------------------------------------------" << std::endl;
           std::cout << "Seed: " << this->seed << std::endl;
-          std::cout << "Size: " << checked_chunks.size() << std::endl;
           std::cout << "Chunks: (" << x << ", " << z << ")" << std::endl;
           std::cout << "Coordinates: (" << x*16 << ", " << z*16 << ")" << std::endl << std::endl;
+
+          if (this->returnOnlyRectangles) {
+            std::cout << "Size: " << largest_rect_dimensions.x * largest_rect_dimensions.z << std::endl;
+          } else {
+            std::cout << "Size: " << checked_chunks.size() << std::endl;
+          }
+
           this->printCluster(checked_chunks);
 
-          // Find largest rect dimensions within cluster region
-          std::vector<std::vector<bool>> cluster_region = this->generateClusterRegion(checked_chunks);
-          coords largest_rect_dimensions = this->createSubMatrixHistogram(cluster_region);
-          std::cout << largest_rect_dimensions.x << " " << largest_rect_dimensions.z << std::endl;
+          // Return cluster if area >= this->min_size
+          if (largest_rect_dimensions.x * largest_rect_dimensions.z >= this->min_size) {
+            std::cout << largest_rect_dimensions.x << " " << largest_rect_dimensions.z << std::endl;
+          }
         }
       }
     }

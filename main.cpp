@@ -5,9 +5,10 @@
 using namespace world;
 
 const bool logging = true;
+const bool returnOnlyRectangles = true;
 const int chunk_radius = 10000;
 const int spacing = 2; // Default 1
-const int min_size = 14;
+const int min_size = 8;
 
 int main()
 {
@@ -24,7 +25,7 @@ int main()
     long seed = distr(eng) * (rand() % 2 ? 1 : -1);
 
     // Search world
-    World world = World(seed, chunk_radius, min_size, spacing, true);
+    World world = World(seed, chunk_radius, min_size, spacing, logging, returnOnlyRectangles);
   }
   return 0;
 }
