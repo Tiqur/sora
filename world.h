@@ -221,13 +221,13 @@ namespace world
 
               // Convert vector of coords to vector of strings
               for(coords c : checked_chunks)
-                chunks_string = chunks_string + "{x: " + std::to_string(x) + ", z: " + std::to_string(z) + "}, ";
+                chunks_string = chunks_string + "{\"x\": " + std::to_string(c.x) + ", \"z\": " + std::to_string(c.z) + "}, ";
 
               // Trim end of string
               chunks_string = chunks_string.substr(0, chunks_string.length()-2);
               chunks_string = "[" + chunks_string + "]";
 
-              params = params + "{seed: " + std::to_string(this->seed) + " ,chunks: " + chunks_string + "}";
+              params = params + "{\"seed\": " + std::to_string(this->seed) + " ,\"chunks\": " + chunks_string + "}";
 
               std::cout << params;
 
