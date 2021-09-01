@@ -8,7 +8,7 @@ const bool logging = true;
 const bool returnOnlyRectangles = true;
 const int chunk_radius = 10000;
 const int spacing = 3; // Default 1
-const int min_size = 9;
+const int min_size = 4;
 
 int main()
 {

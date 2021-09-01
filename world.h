@@ -1,8 +1,10 @@
 #include <iostream>
 #include <algorithm>
+#include <sstream>
 #include <stack>
 #include <set>
 #include "random.h"
+#include "HTTPRequest.h"
 using namespace javarand;
 
 
@@ -210,11 +212,37 @@ namespace world
 
           // Return cluster if area >= this->min_size
           if (largest_rect_dimensions.x * largest_rect_dimensions.z >= this->min_size) {
-            // Post to database or write to file
+            // Post to database
+            try
+            {
+              http::Request request("http://149.28.75.54/api");
+              std::string chunks_string;
+              std::string params;
+
+              // Convert vector of coords to vector of strings
+              for(coords c : checked_chunks)
+                chunks_string = chunks_string + "{x: " + std::to_string(x) + ", z: " + std::to_string(z) + "}, ";
+
+              // Trim end of string
+              chunks_string = chunks_string.substr(0, chunks_string.length()-2);
+              chunks_string = "[" + chunks_string + "]";
+
+              params = params + "{seed: " + std::to_string(this->seed) + " ,chunks: " + chunks_string + "}";
+
+              std::cout << params;
 
 
+              // Send request
+              const auto response = request.send("POST", params, {
+                  "Content-Type: application/json"
+              });
+              std::cout << std::string{response.body.begin(), response.body.end()} << '\n'; // print the result
 
-
+            }
+            catch (const std::exception& e)
+            {
+              std::cerr << "Request failed, error: " << e.what() << '\n';
+            }
           }
         }
       }
