@@ -1,9 +1,13 @@
 FROM alpine
 
+ARG THREADS
+ENV THREADS = ${THREADS}
+
 WORKDIR /app
 
-COPY a.out .
+RUN apk --update add parallel && \
+    apk --update add musl
 
-CMD ["./a.out"]
+COPY a.out start.sh .
 
-
+CMD ["./start.sh"]
