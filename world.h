@@ -3,10 +3,7 @@
 #include <sstream>
 #include <stack>
 #include <set>
-#include "random.h"
 #include "HTTPRequest.h"
-using namespace javarand;
-
 
 struct coords
 {
@@ -34,7 +31,6 @@ namespace world
       bool returnOnlyRectangles = true;
       int spacing = 1;
       int min_size = 8;
-      JavaRandom rand;
 
       void search(int radius);
       coords findLargestRect(std::vector<int>);
@@ -61,16 +57,29 @@ namespace world
   // Determine if there is a slime chunk at x, z
   bool World::isSlimeChunk(int x, int z) 
   {
-    // Set seed and location
-    rand.setSeed(
-      this->seed +
+    long seed = 1 +
       (int) (x * x * 0x4c1906) +
       (int) (x * 0x5ac0db) +
       (int) (z * z) * 0x4307a7L +
-      (int) (z * 0x5f24f) ^ 0x3ad8025fL);
+      (int) (z * 0x5f24f) ^ 0x3ad8025fL;
+
+    auto next = [&]() 
+    { 
+      seed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFF;
+      return (int)(seed >> 17);
+    };
+
+    seed = (seed ^ 0x5DEECE66DL) & 0xFFFFFFFFFFFF;
+
+    int bits, val;
+
+    do {
+      bits = next();
+      val = bits % 10;
+    } while(bits - val + 9 < 0);
 
     // Determine if slime chunk
-    return !(rand.nextInt(10));
+    return !val;
   }
 
   // Search radius around 0, 0 for slime chunks
