@@ -57,7 +57,7 @@ namespace world
   // Determine if there is a slime chunk at x, z
   bool World::isSlimeChunk(int x, int z) 
   {
-    long seed = 1 +
+    long seed = this->seed +
       (int) (x * x * 0x4c1906) +
       (int) (x * 0x5ac0db) +
       (int) (z * z) * 0x4307a7L +
