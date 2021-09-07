@@ -1,8 +1,5 @@
 FROM alpine
 
-ARG THREADS
-ENV THREADS = ${THREADS}
-
 WORKDIR /app
 
 RUN apk --update add parallel && \

@@ -1,3 +1,3 @@
 #!/bin/sh
 
-eval "parallel --lb ./a.out ::: {1..$THREADS}"
+parallel --lb ./a.out ::: $(seq $THREADS)
