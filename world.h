@@ -227,7 +227,12 @@ namespace world
               chunks_string = chunks_string.substr(0, chunks_string.length()-2);
               chunks_string = "[" + chunks_string + "]";
 
-              params = params + "{\"seed\": " + std::to_string(this->seed) + " ,\"chunks\": " + chunks_string + "}";
+              params = params +
+                "{\"seed\": " + std::to_string(this->seed) +
+                " ,\"chunks\": " + chunks_string +
+                " ,\"coords\": " + "{\"x\": " + std::to_string(checked_chunks[0].x << 4) + ", \"z\": " + std::to_string(checked_chunks[0].z << 4) + "}" + 
+                " ,\"size\": " + std::to_string(checked_chunks.size()) +
+                "}";
 
               std::cout << params;
 
