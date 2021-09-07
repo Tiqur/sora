@@ -6,9 +6,9 @@ using namespace world;
 
 const bool logging = true;
 const bool returnOnlyRectangles = true;
-const int chunk_radius = 100;
-const int spacing = 1; 
-const int min_size = 6;
+const int chunk_radius = 10000;
+const int spacing = 4; 
+const int min_size = 18;
 
 int main()
 {
