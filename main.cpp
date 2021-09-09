@@ -24,14 +24,14 @@ int main()
   // Generate random number
   std::random_device rd;
   std::mt19937_64 eng(rd());
-  std::uniform_int_distribution<long> distr;
+  std::uniform_int_distribution<long long unsigned> distr(0, 0xFFFFFFFFFFFFFFFF);
   std::srand(time(NULL));
 
   // Main loop
   while (1)
   {
     // Generate seed
-    long seed = distr(eng) * (rand() % 2 ? 1 : -1);
+    long long int seed = distr(eng) - 0x8000000000000000;
 
     // Search world
     std::cout << "Searching: " << seed << std::endl;

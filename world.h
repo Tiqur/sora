@@ -26,7 +26,7 @@ namespace world
   class World
   {
     private:
-      long seed;
+      long long int seed;
       bool logging = false;
       bool returnOnlyRectangles = true;
       int spacing = 1;
@@ -44,7 +44,7 @@ namespace world
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
 
-      World(long seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles) {
+      World(long long int seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles) {
         this->min_size = min_size;
         this->returnOnlyRectangles = returnOnlyRectangles;
         this->logging = logging;
