@@ -206,12 +206,13 @@ namespace world
 
         // Only call if not duplicate
         if (it_res.second && this->logging && should_return_cluster) {
+          int largest_area = largest_rect_dimensions.x * largest_rect_dimensions.z;
           std::cout << "Seed: " << this->seed << std::endl;
           std::cout << "Chunks: (" << x << ", " << z << ")" << std::endl;
           std::cout << "Coordinates: (" << x*16 << ", " << z*16 << ")" << std::endl;
 
           if (this->returnOnlyRectangles) {
-            std::cout << "Size: " << largest_rect_dimensions.x * largest_rect_dimensions.z << std::endl;
+            std::cout << "Size: " << largest_area << std::endl;
           } else {
             std::cout << "Size: " << checked_chunks.size() << std::endl;
           }
@@ -220,7 +221,7 @@ namespace world
           std::cout << "-----------------------------------------------" << std::endl;
 
           // Return cluster if area >= this->min_size
-          if (largest_rect_dimensions.x * largest_rect_dimensions.z >= this->min_size) {
+          if (largest_area >= this->min_size) {
             // Post to database
             try
             {
@@ -240,7 +241,7 @@ namespace world
                 "{\"seed\": \"" + std::to_string(this->seed) + "\"" +
                 " ,\"chunks\": " + chunks_string +
                 " ,\"coords\": " + "{\"x\": " + std::to_string(checked_chunks[0].x << 4) + ", \"z\": " + std::to_string(checked_chunks[0].z << 4) + "}" + 
-                " ,\"size\": " + std::to_string(checked_chunks.size()) +
+                " ,\"size\": " + std::to_string(largest_area) +
                 "}";
 
               std::cout << params;
