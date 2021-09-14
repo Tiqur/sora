@@ -29,6 +29,7 @@ namespace world
       long long int seed;
       bool logging = false;
       bool returnOnlyRectangles = true;
+      bool allowOneWides = true;
       int spacing = 1;
       int min_size = 8;
 
@@ -44,8 +45,9 @@ namespace world
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
 
-      World(long long int seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles) {
+      World(long long int seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles, bool allowOneWides) {
         this->min_size = min_size;
+        this->allowOneWides = allowOneWides;
         this->returnOnlyRectangles = returnOnlyRectangles;
         this->logging = logging;
         this->spacing = spacing;
@@ -204,8 +206,11 @@ namespace world
         // If should return cluster
         bool should_return_cluster = (this->returnOnlyRectangles ? largest_rect_dimensions.x * largest_rect_dimensions.z > this->min_size : checked_chunks.size() > this->min_size);
 
+        // If should return one wide clusters
+        bool allowOneWides = this->allowOneWides ? (largest_rect_dimensions.x == 1 || largest_rect_dimensions.z == 1) : true;
+
         // Only call if not duplicate
-        if (it_res.second && this->logging && should_return_cluster) {
+        if (it_res.second && this->logging && should_return_cluster && allowOneWides) {
           int largest_area = largest_rect_dimensions.x * largest_rect_dimensions.z;
           std::cout << "Seed: " << this->seed << std::endl;
           std::cout << "Chunks: (" << x << ", " << z << ")" << std::endl;

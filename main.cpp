@@ -35,7 +35,7 @@ int main()
 
     // Search world
     std::cout << "Searching: " << seed << std::endl;
-    World world = World(seed, chunk_radius, min_size, spacing, logging, returnOnlyRectangles);
+    World world = World(seed, chunk_radius, min_size, spacing, logging, returnOnlyRectangles, false);
   }
   return 0;
 }
