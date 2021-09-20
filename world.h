@@ -172,11 +172,10 @@ namespace world
   {
     // Holds coordinates of already checked chunks 
     static std::vector<coords> checked_chunks;
-    coords current_coords = coords{x, z};
     
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
-    bool contains_chunk = std::any_of(checked_chunks.begin(), checked_chunks.end(), [current_coords](coords c1){ return(c1.x == current_coords.x && c1.z == current_coords.z);});
-    if (this->isSlimeChunk(x, z) && !contains_chunk) {
+    if (this->isSlimeChunk(x, z) && !std::any_of(checked_chunks.begin(), checked_chunks.end(), [x, z](coords c1){ return(c1.x == x && c1.z == z);})) {
+      coords current_coords = coords{x, z};
 
       // If initial cluster check, clear checked_chunks
       if (depth)
@@ -190,7 +189,6 @@ namespace world
       getCluster(x-1, z);
       getCluster(x, z+1);
       getCluster(x, z-1);
-
 
       // Add cluster to set if size >= min_size
       if (checked_chunks.size() >= this->min_size && depth) {
