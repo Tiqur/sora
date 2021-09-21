@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <array>
 #include <sstream>
 #include <stack>
 #include <set>
@@ -23,20 +24,29 @@ bool operator==(const coords& c1, const coords& c2)
 
 namespace world
 {
+
+  long getCoordinateValue(int x, int z) 
+  {
+    return (x * x * 0x4c1906) + (x * 0x5ac0db) + (z * z) * 0x4307a7L + (z * 0x5f24f);
+  }
+
   class World
   {
     private:
+      long* cached_coordinate_values;
       long long int seed;
       bool logging = false;
       bool returnOnlyRectangles = true;
       bool allowOneWides = true;
       int spacing = 1;
+      int radius = 0;
       int min_size = 8;
+      int cache_size = 0;
 
-      void search(int radius);
+      void search();
       coords findLargestRect(std::vector<int>);
-      bool isSlimeChunk(int x, int z);
-      void getCluster(int x, int z, int depth = 0);
+      bool isSlimeChunk(long cached_coordinate_value, long long int seed);
+      void getCluster(int x, int z, int cache_index, int depth = 0);
       std::set<std::vector<coords>> slime_clusters;
       coords createSubMatrixHistogram(std::vector<std::vector<bool>> chunks);
       std::vector<std::vector<bool>> generateClusterRegion(std::vector<coords>);
@@ -45,36 +55,34 @@ namespace world
       void printMap(int radius);
       void printCluster(std::vector<coords> chunks);
 
-      World(long long int seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles, bool allowOneWides) {
+      World(long long int seed, int radius, int min_size, int spacing, bool logging, bool returnOnlyRectangles, long* cached_coordinate_values, const int cache_size, bool allowOneWides) {
         this->min_size = min_size;
+        this->cache_size = cache_size;
         this->allowOneWides = allowOneWides;
+        this->cached_coordinate_values = cached_coordinate_values;
         this->returnOnlyRectangles = returnOnlyRectangles;
         this->logging = logging;
         this->spacing = spacing;
         this->seed = seed;
-        this->search(radius);
+        this->radius = radius;
+        this->search();
       }
   };
 
   // Determine if there is a slime chunk at x, z
-  bool World::isSlimeChunk(int x, int z) 
+  bool World::isSlimeChunk(long cached_coordinate_value, long long int seed) 
   {
-    return !(((((((this->seed +
-      (x * x * 0x4c1906) +
-      (x * 0x5ac0db) +
-      (z * z) * 0x4307a7L +
-      (z * 0x5f24f) ^ 0x3ad8025fL) ^ 0x5DEECE66DL)
-      & 0xFFFFFFFFFFFF) * 0x5DEECE66DL + 0xBL)
-      & 0xFFFFFFFFFFFF) >> 17) % 10);
+    return !((((((cached_coordinate_value + seed ^ 0x3ad8025fL ^ 0x5DEECE66DL) & 0xFFFFFFFFFFFF) * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFF) >> 17) % 10);
   }
 
   // Search radius around 0, 0 for slime chunks
-  void World::search(int radius)
+  void World::search()
   {
-    int half_radius = radius / 2;
+    int index = 0;
+    int half_radius = this->radius / 2;
     for (int z = -half_radius; z < half_radius; z+=this->spacing)
       for (int x = -half_radius; x < half_radius; x+=this->spacing)
-        getCluster(x, z, 1);
+        this->getCluster(x, z, index++, 1);
   }
 
   // https://www.youtube.com/watch?v=g8bSdXCG-lA
@@ -152,13 +160,13 @@ namespace world
   }
 
   // Recursively search for nearby slime chunks within cluster and return dimensions
-  void World::getCluster(int x, int z, int depth)
+  void World::getCluster(int x, int z, int cache_index, int depth)
   {
     // Holds coordinates of already checked chunks 
     static std::vector<coords> checked_chunks;
     
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
-    if (this->isSlimeChunk(x, z) && !std::any_of(checked_chunks.begin(), checked_chunks.end(), [x, z](coords c1){ return(c1.x == x && c1.z == z);})) {
+    if (this->isSlimeChunk(this->cached_coordinate_values[cache_index], this->seed) && !std::any_of(checked_chunks.begin(), checked_chunks.end(), [x, z](coords c1){ return(c1.x == x && c1.z == z);})) {
       coords current_coords = coords{x, z};
 
       // If initial cluster check, clear checked_chunks
@@ -169,10 +177,17 @@ namespace world
       checked_chunks.push_back(current_coords);
 
       // Check sides
-      getCluster(x+1, z);
-      getCluster(x-1, z);
-      getCluster(x, z+1);
-      getCluster(x, z-1);
+      if (cache_index+1 < this->cache_size)
+        getCluster(x+1, z, cache_index+1);
+      
+      if (cache_index-1 > 0)
+        getCluster(x-1, z, cache_index-1);
+      
+      if (cache_index+this->radius < this->cache_size)
+        getCluster(x, z+1, cache_index+this->radius);
+
+      if (cache_index-this->radius > 0)
+        getCluster(x, z-1, cache_index-this->radius);
 
       // Add cluster to set if size >= min_size
       if (checked_chunks.size() >= this->min_size && depth) {
