@@ -46,7 +46,7 @@ namespace world
       void search();
       coords findLargestRect(std::vector<int>);
       bool isSlimeChunk(long cached_coordinate_value, long long int seed);
-      void getCluster(int x, int z, int cache_index, int depth = 0);
+      void getCluster(int x, int z, long coordinate_value, int depth = 0);
       std::set<std::vector<coords>> slime_clusters;
       coords createSubMatrixHistogram(std::vector<std::vector<bool>> chunks);
       std::vector<std::vector<bool>> generateClusterRegion(std::vector<coords>);
@@ -82,7 +82,7 @@ namespace world
     int half_radius = this->radius / 2;
     for (int z = -half_radius; z < half_radius; z+=this->spacing)
       for (int x = -half_radius; x < half_radius; x+=this->spacing)
-        this->getCluster(x, z, index++, 1);
+        this->getCluster(x, z, this->cached_coordinate_values[index++], 1);
   }
 
   // https://www.youtube.com/watch?v=g8bSdXCG-lA
@@ -160,13 +160,13 @@ namespace world
   }
 
   // Recursively search for nearby slime chunks within cluster and return dimensions
-  void World::getCluster(int x, int z, int cache_index, int depth)
+  void World::getCluster(int x, int z, long coordinate_value, int depth)
   {
     // Holds coordinates of already checked chunks 
     static std::vector<coords> checked_chunks;
     
     // If not slime chunk and checked_chunks does not include these coordinates ( chunk hasn't been checked ), return false;
-    if (this->isSlimeChunk(this->cached_coordinate_values[cache_index], this->seed) && !std::any_of(checked_chunks.begin(), checked_chunks.end(), [x, z](coords c1){ return(c1.x == x && c1.z == z);})) {
+    if (this->isSlimeChunk(coordinate_value, this->seed) && !std::any_of(checked_chunks.begin(), checked_chunks.end(), [x, z](coords c1){ return(c1.x == x && c1.z == z);})) {
       coords current_coords = coords{x, z};
 
       // If initial cluster check, clear checked_chunks
@@ -176,18 +176,11 @@ namespace world
       // Push self to checked chunks
       checked_chunks.push_back(current_coords);
 
-      // Check sides
-      if (cache_index+1 < this->cache_size)
-        getCluster(x+1, z, cache_index+1);
-      
-      if (cache_index-1 > 0)
-        getCluster(x-1, z, cache_index-1);
-      
-      if (cache_index+this->radius < this->cache_size)
-        getCluster(x, z+1, cache_index+this->radius);
-
-      if (cache_index-this->radius > 0)
-        getCluster(x, z-1, cache_index-this->radius);
+      // Check sides ( This won't access cached coordinate values ( So they have to be calculated at "runtime" ))
+      getCluster(x+1, z, getCoordinateValue(x+1, z));
+      getCluster(x-1, z, getCoordinateValue(x-1, z));
+      getCluster(x, z+1, getCoordinateValue(x, z+1));
+      getCluster(x, z-1, getCoordinateValue(x, z-1));
 
       // Add cluster to set if size >= min_size
       if (checked_chunks.size() >= this->min_size && depth) {
@@ -204,7 +197,7 @@ namespace world
         bool should_return_cluster = (this->returnOnlyRectangles ? largest_rect_dimensions.x * largest_rect_dimensions.z > this->min_size : checked_chunks.size() > this->min_size);
 
         // If should return one wide clusters
-        bool allowOneWides = this->allowOneWides ? (largest_rect_dimensions.x == 1 || largest_rect_dimensions.z == 1) : true;
+        bool allowOneWides = this->allowOneWides ? true : (largest_rect_dimensions.x != 1 && largest_rect_dimensions.z != 1);
 
         // Only call if not duplicate
         if (it_res.second && this->logging && should_return_cluster && allowOneWides) {

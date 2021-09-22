@@ -29,15 +29,20 @@ int main()
   std::srand(time(NULL));
 
   // Initialize cache array
-  const int array_size = (chunk_radius / spacing + 1) * (chunk_radius / spacing + 1);
+  const int c_r = (chunk_radius / spacing) | 0;
+  const int array_size = c_r * c_r;
   long cached_coordinate_values[array_size];
 
   // Load cached_coordinate_values 
   int index = 0;
   int half_radius = chunk_radius / 2;
-  for (int z = -half_radius; z < half_radius; z+= spacing)
-    for (int x = -half_radius; x < half_radius; x+= spacing)
-      cached_coordinate_values[index++] = getCoordinateValue(x, z);
+
+  for (int i = 0; i < array_size; i++)
+  {
+    int x = i / c_r - c_r / 2 | 0;
+    int z = i % c_r - c_r / 2 | 0;
+    cached_coordinate_values[index++] = getCoordinateValue(x, z);
+  }
 
   // Main loop
   while (true)
@@ -46,7 +51,6 @@ int main()
     long long int seed = distr(eng) - 0x8000000000000000;
 
     // Search world
-    std::cout << "Searching: " << seed << std::endl;
     World world = World(seed, chunk_radius, min_size, spacing, logging, returnOnlyRectangles, cached_coordinate_values, array_size, false);
   }
 
