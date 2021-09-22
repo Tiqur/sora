@@ -9,7 +9,7 @@ const bool logging = true;
 const bool returnOnlyRectangles = true;
 const int chunk_radius = 250;
 const int spacing = 4; 
-const int min_size = 16;
+const int min_size = 8;
 
 int main()
 {
@@ -39,8 +39,8 @@ int main()
 
   for (int i = 0; i < array_size; i++)
   {
-    int x = i / c_r - c_r / 2 | 0;
-    int z = i % c_r - c_r / 2 | 0;
+    int x = (i / c_r - c_r / 2 | 0) * spacing;
+    int z = (i % c_r - c_r / 2 | 0) * spacing;
     cached_coordinate_values[index++] = getCoordinateValue(x, z);
   }
 
