@@ -45,6 +45,7 @@ int main()
   af::array X = af::array(1, array_length, x_coords);
   af::array Z = af::array(1, array_length, z_coords);
 
+  // Main loop
   while (true)
   {
     // Create matrix of random values ( seeds )
@@ -52,5 +53,21 @@ int main()
 
     // Initialize chunk values
     af::array DATA = af::array(batch_size, array_length, b8);
+    af::array a, b;
+
+    // Compute matrix operations in parallel to check if slime chunk
+    gfor(af::seq i, batch_size)
+      DATA = !(((((((SEEDS(i) +
+        (X * X * 0x4c1906).as(s32) +
+        (X * 0x5ac0db).as(s32) +
+        (Z * Z).as(s32) * 0x4307a7 +
+        (Z * 0x5f24f).as(s32) ^ 0x3ad8025f) ^ 0x5DEECE66D)
+        & 0xFFFFFFFFFFFF) * 0x5DEECE66D + 0xB)
+        & 0xFFFFFFFFFFFF) >> 17) % 10);
+
+    //af_print(SEEDS);
+    //af_print(X);
+    //af_print(Z);
+    //af_print(DATA);
   }
 }
