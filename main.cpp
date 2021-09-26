@@ -41,13 +41,16 @@ int main()
       index++;
     }
 
-  // Coordinate chunk values
+  // Cached coordinate chunk values
   af::array X = af::array(1, array_length, x_coords);
   af::array Z = af::array(1, array_length, z_coords);
 
-  // Create matrix of random values ( seeds )
-  af::array SEEDS = af::randu(batch_size, s64);
-  af_print(SEEDS)
-  af_print(X)
-  af_print(Z)
+  while (true)
+  {
+    // Create matrix of random values ( seeds )
+    af::array SEEDS = af::randu(batch_size, s64);
+
+    // Initialize chunk values
+    af::array DATA = af::array(batch_size, array_length, b8);
+  }
 }
