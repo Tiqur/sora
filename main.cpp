@@ -11,6 +11,7 @@ const int chunk_radius = 250;
 const int spacing = 4; 
 const int min_size = 16;
 const int batch_size = 10;
+const int array_length = std::round((chunk_radius * chunk_radius + (chunk_radius % spacing == 0 ? 0 : chunk_radius*2)) / spacing);
 
 int main()
 {
