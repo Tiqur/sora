@@ -10,6 +10,7 @@ const bool returnOnlyRectangles = true;
 const int chunk_radius = 250;
 const int spacing = 4; 
 const int min_size = 16;
+const int batch_size = 10;
 
 int main()
 {
@@ -22,37 +23,24 @@ int main()
   std::cout << "Minimum Cluster Size: " << min_size << std::endl;
   std::cout << "-----------------------------------------------" << std::endl;
   
-  // Generate random number
-  std::random_device rd;
-  std::mt19937_64 eng(rd());
-  std::uniform_int_distribution<long long unsigned> distr(0, 0xFFFFFFFFFFFFFFFF);
-  std::srand(time(NULL));
+  // Initialize generator with different value each time
+  af::setSeed(time(NULL));
 
-  // Initialize cache array
-  const int c_r = (chunk_radius / spacing) | 0;
-  const int array_size = c_r * c_r;
-  long cached_coordinate_values[array_size];
+  // Create matrix of random values ( seeds )
+  af::array SEEDS = af::randu(batch_size, s64);
+  af_print(SEEDS)
 
-  // Load cached_coordinate_values 
-  int index = 0;
-  int half_radius = chunk_radius / 2;
 
-  for (int i = 0; i < array_size; i++)
-  {
-    int x = (i / c_r - c_r / 2 | 0) * spacing;
-    int z = (i % c_r - c_r / 2 | 0) * spacing;
-    cached_coordinate_values[index++] = world::getCoordinateValue(x, z);
-  }
 
   // Main loop
-  while (true)
-  {
-    // Generate seed
-    long long int seed = distr(eng) - 0x8000000000000000;
+  //while (true)
+  //{
+  //  // Generate seed
+  //  long long int seed = distr(eng) - 0x8000000000000000;
 
-    // Search world
-    world::World world = world::World(seed, chunk_radius, min_size, spacing, logging, returnOnlyRectangles, cached_coordinate_values, array_size, false);
-  }
+  //  // Search world
+  //  world::World world = world::World(seed, chunk_radius, min_size, spacing, logging, returnOnlyRectangles, cached_coordinate_values, array_size, false);
+  //}
 
   return 0;
 }
