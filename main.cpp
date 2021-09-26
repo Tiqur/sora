@@ -7,11 +7,11 @@
 
 const bool logging = true;
 const bool returnOnlyRectangles = true;
-const int chunk_radius = 250;
+const int chunk_radius = 25;
 const int spacing = 4; 
 const int min_size = 16;
 const int batch_size = 10;
-const int array_length = std::round((chunk_radius * chunk_radius + (chunk_radius % spacing == 0 ? 0 : chunk_radius*2)) / spacing);
+const int array_length = std::ceil((float)(chunk_radius * chunk_radius + (chunk_radius % spacing == 0 ? 0 : chunk_radius*2)) / spacing);
 
 int main()
 {
@@ -30,6 +30,7 @@ int main()
   // Create matrix of random values ( seeds )
   af::array SEEDS = af::randu(batch_size, s64);
   af_print(SEEDS)
+  std::cout << array_length << std::endl;
 
 
 
