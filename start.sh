@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Start search
-parallel ./a.out ::: $(seq $THREADS) &
+parallel LD_LIBRARY_PATH=/opt/arrayfire/lib64 ./sora ::: $(seq $THREADS) &
 
 # Ping server every second
 while sleep 2; do
